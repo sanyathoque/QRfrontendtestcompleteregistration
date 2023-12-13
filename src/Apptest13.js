@@ -9,8 +9,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 function App() {
-  const [username, setUsername] = useState()
-  const [phone_number, setPhone_number] = useState()
   const [firstname, setFirstname] = useState()
   const [lastname, setLastname] = useState()
   const [DOB, setDOB] = useState()
@@ -42,7 +40,7 @@ function App() {
 
   const getPdf = async () => {
     try {
-      const result = await axios.get("http://localhost:5000/api/auth/get-files");
+      const result = await axios.get("http://localhost:5000/get-files");
       console.log(result.data.data);
       setAllImage(result.data.data);
     } catch (error) {
@@ -54,8 +52,6 @@ function App() {
   const submitImage = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('username', username);
-    formData.append('phone_number', phone_number);
     formData.append('firstname', firstname);
     formData.append('lastname', lastname);
     formData.append('DOB', DOB)
@@ -77,9 +73,10 @@ function App() {
     formData.append('files', vehicle_insurance_pic)
     formData.append('files', vehicle_fitness_pic)
     formData.append('files', registration_certificate)
+    
     try {
       const result = await axios.post(
-        "http://localhost:5000/api/auth/vehicle_register",
+        "http://localhost:5000/upload-files",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -95,14 +92,7 @@ function App() {
       setError("Error uploading file");
     }
   };
-  const handleInputChangeusername = (e) => {
-    setUsername(e.target.value)
-    console.log("username", username)
-  }
-  const handleInputChangephone_number = (e) => {
-    setPhone_number(e.target.value)
-    console.log("phone_number", phone_number)
-  }
+
   const handleInputChangefirstname = (e) => {
     setFirstname(e.target.value)
   }
@@ -168,20 +158,13 @@ function App() {
   }
 
   const showPdf = (pdf) => {
-    setPdfFile(`http://localhost:5000/api/auth/files/${pdf}`);
+    setPdfFile(`http://localhost:5000/files/${pdf}`);
   };
 
   return (
     <div className="App">
       <form className="formStyle" onSubmit={submitImage}>
-        <label>User Name:
-          <input type="text" name="username" onChange={handleInputChangeusername} />
-        </label>
-        <br />
-        <label>Phone Number:
-          <input type="number" name="phone_number" onChange={handleInputChangephone_number} />
-        </label>
-        <label>First Name:
+      <label>First Name:
           <input type="text" name="firstname" onChange={handleInputChangefirstname} />
         </label>
         <br />
@@ -277,36 +260,22 @@ function App() {
         <h4>Uploaded PDF:</h4>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="output-div">
-          {allImage?.map((data) => (
-            <div>
-              {/* {console.log("retrieved_data", data)} */}
-              <p>{data.username}</p>
-              <p>{data.phone_number}</p>
-              <p>{data.firstname}</p>
-              <p>{data.lastname}</p>
-              <p>{data.DOB}</p>
-              <p>{data.male}</p>
-              <p>{data.female}</p>
-              <p>{data.car}</p>
-              <p>{data.bike}</p>
-              <p>{data.auto}</p>
-              <p>{data.driver}</p>
-              <p>{data.vehicle_detail}</p>
-              <p>{data.appearance}</p>
-              <p>{data.RC}</p>
-              <p>{data.vehicle_insurance}</p>
-              <p>{data.tax_permit}</p>
-              <p>{data.vehicle_fitness}</p>
-              <img src={`http://localhost:5000/api/auth/files/${data.profile_picture}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.appearance_frontside}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.appearance_backside}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.vehicle_insurance_pic}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.vehicle_fitness_pic}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.registration_certificate}`} />
-            </div>
-          ))}
+          {allImage == null
+            ? ""
+            : allImage.map((data) => (
+              <div className="inner-div" key={data.pdf}>
+                <h6>Title: {data.title}</h6>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => showPdf(data.pdf)}
+                >
+                  Show Pdf
+                </button>
+              </div>
+            ))}
         </div>
       </div>
+      <PdfComp pdfFile={pdfFile} />
     </div>
   );
 }

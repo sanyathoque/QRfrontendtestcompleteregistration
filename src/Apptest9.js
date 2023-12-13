@@ -1,16 +1,9 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { pdfjs } from "react-pdf";
-import PdfComp from "./PdfComp";
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.js",
-  import.meta.url
-).toString();
+import logo from './logo.svg';
+import './App.css';
+import React, { useState, useEffect } from 'react'
 
 function App() {
-  const [username, setUsername] = useState()
-  const [phone_number, setPhone_number] = useState()
+
   const [firstname, setFirstname] = useState()
   const [lastname, setLastname] = useState()
   const [DOB, setDOB] = useState()
@@ -32,77 +25,7 @@ function App() {
   const [vehicle_insurance_pic, setVehicle_insurance_pic] = useState()
   const [vehicle_fitness_pic, setVehicle_fitness_pic] = useState()
   const [registration_certificate, setRegistration_certificate] = useState()
-  const [allImage, setAllImage] = useState(null);
-  const [pdfFile, setPdfFile] = useState(null);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    getPdf();
-  }, []);
-
-  const getPdf = async () => {
-    try {
-      const result = await axios.get("http://localhost:5000/api/auth/get-files");
-      console.log(result.data.data);
-      setAllImage(result.data.data);
-    } catch (error) {
-      console.error("Error fetching PDFs:", error.message);
-      setError("Error fetching PDFs");
-    }
-  };
-
-  const submitImage = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('phone_number', phone_number);
-    formData.append('firstname', firstname);
-    formData.append('lastname', lastname);
-    formData.append('DOB', DOB)
-    formData.append('male', male)
-    formData.append('female', female)
-    formData.append('car', car)
-    formData.append('bike', bike)
-    formData.append('auto', auto)
-    formData.append('driver', driver)
-    formData.append('vehicle_detail', vehicle_detail)
-    formData.append('appearance', appearance)
-    formData.append('RC', RC)
-    formData.append('vehicle_insurance', vehicle_insurance)
-    formData.append('tax_permit', tax_permit)
-    formData.append('vehicle_fitness', vehicle_fitness)
-    formData.append('files', profile_picture)
-    formData.append('files', appearance_frontside)
-    formData.append('files', appearance_backside)
-    formData.append('files', vehicle_insurance_pic)
-    formData.append('files', vehicle_fitness_pic)
-    formData.append('files', registration_certificate)
-    try {
-      const result = await axios.post(
-        "http://localhost:5000/api/auth/vehicle_register",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      console.log(result.statusText);
-      if (result.statusText === "OK") {
-        alert("Uploaded Successfully!!!");
-        getPdf();
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error.message);
-      setError("Error uploading file");
-    }
-  };
-  const handleInputChangeusername = (e) => {
-    setUsername(e.target.value)
-    console.log("username", username)
-  }
-  const handleInputChangephone_number = (e) => {
-    setPhone_number(e.target.value)
-    console.log("phone_number", phone_number)
-  }
   const handleInputChangefirstname = (e) => {
     setFirstname(e.target.value)
   }
@@ -167,20 +90,79 @@ function App() {
     setRegistration_certificate(e.target.files[0])
   }
 
-  const showPdf = (pdf) => {
-    setPdfFile(`http://localhost:5000/api/auth/files/${pdf}`);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log('firstname', firstname)
+    console.log('lastname', lastname)
+    console.log('DOB', DOB)
+    console.log('male', male)
+    console.log('female', female)
+    console.log('car', car)
+    console.log('bike', bike)
+    console.log('auto', auto)
+    console.log('driver', driver)
+    console.log('vehicle_detail', vehicle_detail)
+    console.log('appearance', appearance)
+    console.log('RC', RC)
+    console.log('vehicle_insurance', vehicle_insurance)
+    console.log('tax_permit', tax_permit)
+    console.log('vehicle_fitness', vehicle_fitness)
+    console.log('profile_picture', profile_picture)
+    console.log('appearance_frontside', appearance_frontside)
+    console.log('appearance_backside', appearance_backside)
+    console.log('vehicle_insurance_pic', vehicle_insurance_pic)
+    console.log('vehicle_fitness_pic', vehicle_fitness_pic)
+    console.log('registration_certificate', registration_certificate)
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('firstname', firstname);
+    formDataToSend.append('lastname', lastname);
+    formDataToSend.append('DOB', DOB)
+    formDataToSend.append('male', male)
+    formDataToSend.append('female', female)
+    formDataToSend.append('car', car)
+    formDataToSend.append('bike', bike)
+    formDataToSend.append('auto', auto)
+    formDataToSend.append('driver', driver)
+    formDataToSend.append('vehicle_detail', vehicle_detail)
+    formDataToSend.append('appearance', appearance)
+    formDataToSend.append('RC', RC)
+    formDataToSend.append('vehicle_insurance', vehicle_insurance)
+    formDataToSend.append('tax_permit', tax_permit)
+    formDataToSend.append('vehicle_fitness', vehicle_fitness)
+    formDataToSend.append('profile_picture', profile_picture)
+    formDataToSend.append('appearance_frontside', appearance_frontside)
+    formDataToSend.append('appearance_backside', appearance_backside)
+    formDataToSend.append('vehicle_insurance_pic', vehicle_insurance_pic)
+    formDataToSend.append('vehicle_fitness_pic', vehicle_fitness_pic)
+    formDataToSend.append('registration_certificate', registration_certificate)
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/vehicle_register', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        console.log('Cool profile created successfully');
+      } else {
+        console.error('Failed to create cool profile');
+      }
+    } catch (error) {
+      console.error('Error during fetch:', error);
+    }
   };
 
   return (
     <div className="App">
-      <form className="formStyle" onSubmit={submitImage}>
-        <label>User Name:
-          <input type="text" name="username" onChange={handleInputChangeusername} />
-        </label>
-        <br />
-        <label>Phone Number:
-          <input type="number" name="phone_number" onChange={handleInputChangephone_number} />
-        </label>
+      <div>
+        {/* {data?.map(x => {
+          console.log(data)
+          { return <img src={`data:image/png;base64,${convertToBase64new(x.profile_picture?.data.data)}`} width="300" /> }
+        })} */}
+      </div>
+      <form onSubmit={handleSubmit}>
         <label>First Name:
           <input type="text" name="firstname" onChange={handleInputChangefirstname} />
         </label>
@@ -273,40 +255,6 @@ function App() {
         <br />
         <button type="submit">Submit</button>
       </form>
-      <div className="uploaded">
-        <h4>Uploaded PDF:</h4>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <div className="output-div">
-          {allImage?.map((data) => (
-            <div>
-              {/* {console.log("retrieved_data", data)} */}
-              <p>{data.username}</p>
-              <p>{data.phone_number}</p>
-              <p>{data.firstname}</p>
-              <p>{data.lastname}</p>
-              <p>{data.DOB}</p>
-              <p>{data.male}</p>
-              <p>{data.female}</p>
-              <p>{data.car}</p>
-              <p>{data.bike}</p>
-              <p>{data.auto}</p>
-              <p>{data.driver}</p>
-              <p>{data.vehicle_detail}</p>
-              <p>{data.appearance}</p>
-              <p>{data.RC}</p>
-              <p>{data.vehicle_insurance}</p>
-              <p>{data.tax_permit}</p>
-              <p>{data.vehicle_fitness}</p>
-              <img src={`http://localhost:5000/api/auth/files/${data.profile_picture}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.appearance_frontside}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.appearance_backside}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.vehicle_insurance_pic}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.vehicle_fitness_pic}`} />
-              <img src={`http://localhost:5000/api/auth/files/${data.registration_certificate}`} />
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
